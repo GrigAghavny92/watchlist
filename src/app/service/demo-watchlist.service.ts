@@ -12,7 +12,7 @@ export class DemoWatchlistService implements WatchListService {
   private readonly LIST_STORAGE_KEY = 'watch_list';
   private readonly OPTIONS_STORAGE_KEY = 'stock_options';
 
-  private readonly defaultWatchList: number[] = [3, 7, 5, 8 ,6];
+  private readonly defaultWatchList: number[] = [3, 7, 5, 8, 6, 1];
 
   private readonly watchList$: BehaviorSubject<StockModel[]>;
 

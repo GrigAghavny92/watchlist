@@ -1,4 +1,5 @@
 <mat-drawer-container class="table" *ngIf="ready()">
+  <h4>Stock Market</h4>
   <mat-card>
       <mat-table [dataSource]="dataSource" class="mat-elevation-z8"
                  matSort  on-mouseleave="hoveredIndex=null">
@@ -19,12 +20,24 @@
 
         <ng-container matColumnDef="bid">
           <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Bid</mat-header-cell>
-          <mat-cell *matCellDef="let element" [matTooltip]="element.bid" matTooltipPosition="below"> <div class="increase_block"><p style="margin: 6px">{{element.bid}}</p></div></mat-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.bid" matTooltipPosition="below">
+            <div [ngClass]="{
+            'increase_block': element.bid < element.last,
+            'decrease_block': element.bid > element.last,
+            'const_block': Number.parseFloat(element.chgInPercent) === 0 && Number.parseFloat(element.chgByCurrency) === 0
+            }"
+            ><p style="margin: 6px">{{element.bid}}</p></div></mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="ask">
           <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Ask</mat-header-cell>
-          <mat-cell *matCellDef="let element" [matTooltip]="element.ask" matTooltipPosition="below"> <div class="decrease_block"><p style="margin: 6px">{{element.ask}}</p></div></mat-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.ask" matTooltipPosition="below">
+            <div [ngClass]="{
+            'increase_block': element.ask < element.last,
+            'decrease_block': element.ask > element.last,
+            'const_block': Number.parseFloat(element.chgInPercent) === 0 && Number.parseFloat(element.chgByCurrency) === 0
+            }">
+              <p style="margin: 6px">{{element.ask}}</p></div></mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="changeInCurrency">
@@ -79,7 +92,7 @@
               disableClose="true">
     <section class="table-update">
         <header class="table-update__header">
-          <h2 class="h3">Add New Symbol</h2>
+          <h5 class="h5">Add Symbol</h5>
         </header>
         <div class="table-update__fields">
           <div class="row">
