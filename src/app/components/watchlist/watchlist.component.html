@@ -1,0 +1,111 @@
+<mat-drawer-container class="table" *ngIf="ready()">
+  <mat-card>
+      <mat-table [dataSource]="dataSource" class="mat-elevation-z8"
+                 matSort  on-mouseleave="hoveredIndex=null">
+
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell mat-column-wide"><div [ngStyle]="{'padding-left':'14px'}">Symbol</div></mat-header-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.name" matTooltipPosition="below" class="mat-column-wide" [ngStyle]="{'color':'#5a83ac'}">
+            <button mat-icon-button>
+              <mat-icon [ngStyle]="{'color':'#5a83ac'}">info</mat-icon>
+            </button>
+            {{element.name}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="last">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Last</mat-header-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.last" matTooltipPosition="below"> {{element.last}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="bid">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Bid</mat-header-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.bid" matTooltipPosition="below"> <div class="increase_block"><p style="margin: 6px">{{element.bid}}</p></div></mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="ask">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Ask</mat-header-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.ask" matTooltipPosition="below"> <div class="decrease_block"><p style="margin: 6px">{{element.ask}}</p></div></mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="changeInCurrency">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Chg $</mat-header-cell>
+          <mat-cell [ngClass]="{'increase': Number.parseFloat(element.chgByCurrency) > 0, 'decrease': Number.parseFloat(element.chgByCurrency) < 0}"
+            *matCellDef="let element" [matTooltip]="element.chgByCurrency" matTooltipPosition="below">{{element.chgByCurrency | valueTransformer}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="changeInPercent">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Chg %</mat-header-cell>
+          <mat-cell [ngClass]="{'increase': Number.parseFloat(element.chgInPercent) > 0, 'decrease': Number.parseFloat(element.chgInPercent) < 0}"
+          *matCellDef="let element" [matTooltip]="element.chgInPercent" matTooltipPosition="below"> {{element.chgInPercent | valueTransformer}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="high">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">High</mat-header-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.high" matTooltipPosition="below"> {{element.high}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="low">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Low</mat-header-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.low" matTooltipPosition="below"> {{element.low}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="vol">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="mat-header-cell">Vol</mat-header-cell>
+          <mat-cell *matCellDef="let element" [matTooltip]="element.vol" matTooltipPosition="below"> {{element.vol}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="delete">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <button mat-icon-button *ngIf="element.id==hoveredIndex" (click)="removeRow(element.id)">
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
+
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayColumns; let index=index" on-mouseover="hoveredIndex=row.id"></mat-row>
+      </mat-table>
+
+    <div class="table__add">
+      <button mat-icon-button (click)="table_update_drawer.toggle()">
+        <mat-icon [ngStyle]="{'color':'#33b27c'}">playlist_add</mat-icon>
+      </button>
+    </div>
+  </mat-card>
+  <mat-drawer mode="over" position="end" #table_update_drawer [(opened)]="openRowDrawer"
+              [opened]="openRowDrawer"
+              disableClose="true">
+    <section class="table-update">
+        <header class="table-update__header">
+          <h2 class="h3">Add New Symbol</h2>
+        </header>
+        <div class="table-update__fields">
+          <div class="row">
+            <div class="col-6">
+              <mat-form-field>
+                <mat-label>Select symbol</mat-label>
+                <mat-select (selectionChange)="selectedSymbolId=$event.value" [(ngModel)]="selectedSymbolId">
+                  @for (symbol of availableStockOptions|keyvalue; track symbol.value) {
+                    <mat-option [value]="symbol.key">{{symbol.value}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <footer class="table-update__footer">
+          <div class="row flex-column-reverse flex-sm-row">
+            <div class="col-12 col-sm-6">
+              <button mat-button [ngStyle]="{'color':'grey'}" (click)="openRowDrawer=false;">Cancel</button>
+            </div>
+            <div class="col-12 col-sm-6">
+              <button mat-button [ngStyle]="{'color':'white', 'background-color': '#33b27c'}" (click)="addSymbol();openRowDrawer=false ">Add</button>
+            </div>
+          </div>
+        </footer>
+    </section>
+
+  </mat-drawer>
+</mat-drawer-container>
